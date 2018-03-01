@@ -1,0 +1,92 @@
+<html>
+    <head>
+         <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+        <!-- jQuery library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+        <!-- Latest compiled JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <style>
+            .sectionMTIS{
+                display: none;
+            }
+            .sectionMTISHome{
+                display: block;
+            }
+            .container{
+                margin-top: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <ul class="nav nav-pills">
+                <li role="presentation" class="active sectionMTISli"><a href="#" mtis-ref="section1">Home</a></li>
+                <li role="presentation" class=" sectionMTISli"><a href="#" mtis-ref="section2">validarNIF</a></li>
+                <li role="presentation" class=" sectionMTISli"><a href="#" mtis-ref="section3">validarIBAN</a></li>
+                <li role="presentation" class=" sectionMTISli"><a href="#" mtis-ref="section4">consultaCodigoPostal</a></li>
+                <li role="presentation" class=" sectionMTISli"><a href="#" mtis-ref="section5">generarPresupuesto</a></li>
+            </ul>
+            <div id="section1" class="sectionMTIS sectionMTISHome">
+                <h1>MTIS Práctica 2</h1>
+                <p>Práctica 2 de MTIS, cliente en html/js que se comunica con una APIREST en nodejs</p>
+                <p>Autor: Diego Maroto</p>
+            </div>
+            <div id="section2" class="sectionMTIS">
+                <h1>Valida un NIF</h1>
+                <form id="section2form">
+                    <div class="form-group">
+                        <label for="inputNIF">NIF</label>
+                        <input type="text" class="form-control" id="inputNIF" placeholder="NIF">
+                    </div>
+                    <input type="submit" class="btn btn-default" value="ValidarNIF">
+                </form>
+                <div class="section2result">
+                    <p>Resultado: -</p>
+                </div>
+            </div>
+            <div id="section3" class="sectionMTIS">
+                <h1>Section 2</h1>
+                <p>Try to scroll this section and look at the navigation bar while scrolling! Try to scroll this section and look at the navigation bar while scrolling!</p>
+                <p>Try to scroll this section and look at the navigation bar while scrolling! Try to scroll this section and look at the navigation bar while scrolling!</p>
+            </div>
+            <div id="section4" class="sectionMTIS">
+                <h1>Section 3</h1>
+                <p>Try to scroll this section and look at the navigation bar while scrolling! Try to scroll this section and look at the navigation bar while scrolling!</p>
+                <p>Try to scroll this section and look at the navigation bar while scrolling! Try to scroll this section and look at the navigation bar while scrolling!</p>
+            </div>
+            <div id="section5" class="sectionMTIS">
+                <h1>Section 4</h1>
+                <p>Try to scroll this section and look at the navigation bar while scrolling! Try to scroll this section and look at the navigation bar while scrolling!</p>
+                <p>Try to scroll this section and look at the navigation bar while scrolling! Try to scroll this section and look at the navigation bar while scrolling!</p>
+            </div>
+            <form>
+
+            </form>
+        </div>
+        <script>
+            $("form").submit(function(e){e.preventDefault()})
+            $("#section2form").submit(function(e){
+                fetch("http://localhost:3000/validarNIF?nif="+$("#inputNIF").val())
+                .then(function(resp){
+                    return resp.json()
+                })
+                .then(function(resp){
+                    $('.section2result').html('<p>Resultado: '+resp.data.result+'</p>')
+                    console.log("OK fetch validarNIF")
+                })
+                .catch(function(){
+                    console.log("Error fetch validarNIF")
+                })
+            })
+            $(".sectionMTISli").click(function(){
+                $(".sectionMTIS").hide()
+                $(".sectionMTISli").removeClass("active")
+                $("#"+$(this).children().attr("mtis-ref")).show()
+                $(this).addClass("active")
+            })
+        </script>
+    </body>
+</html>

@@ -1,11 +1,11 @@
 #%RAML 1.0
 title: MTIS Api Rest - Práctica 2
 mediaType: application/json
-baseUri: http://localhost:8080
+baseUri: http://localhost:3000
 
 /validarNIF:
     get:
-      description: Get if the nif in queryParameter is OK or not
+      description: Return if the nif in queryParameter is OK or not
       queryParameters: 
         nif:
           type: string
@@ -16,8 +16,9 @@ baseUri: http://localhost:8080
         200:
           description: The request was OK, check body response
           body: 
-            example:
-              {"data": {"result": "true"}}
+            application/json:
+              example:
+                {"data": {"result": "true"}}
         400:
           description: Some queryParameters are missing
         403:
@@ -26,7 +27,7 @@ baseUri: http://localhost:8080
           description: Server Internal Error
 /validarIBAN:
     get:
-      description: Get if the iban in queryParameter is OK or not
+      description: Return if the iban in queryParameter is OK or not
       queryParameters: 
         iban:
           type: string
@@ -37,8 +38,9 @@ baseUri: http://localhost:8080
         200:
           description: The request was OK, check body response to know the return
           body: 
-            example:
-              {"data": {"result": "true"}}
+            application/json:
+              example:
+                {"data": {"result": "true"}}
         400:
           description: Some queryParameters are missing
         403:

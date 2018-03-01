@@ -1,0 +1,32 @@
+#%RAML 1.0
+title: MTIS Api Rest - Práctica 2
+mediaType: application/json
+baseUri: http://localhost:3000
+
+/consultaCodigoPostal:
+    get:
+      description: Get a CP and returns the coincidence if exists
+      queryParameters: 
+        cp:
+          type: string
+          description: String of strict 5 chars
+          example: "03007"
+        RestKey:
+          type: string
+      responses:
+        200:
+          description: The request was OK, check body response
+          body: 
+            application/json:
+              example:
+                {"data": {"codigoPostal":string,
+                  "poblacion":string,
+                  "provincia":string,
+                  "existe":boolean
+                }}
+        400:
+          description: Some queryParameters are missing
+        403:
+          description: You have not permission to use this action
+        500:
+          description: Server Internal Error

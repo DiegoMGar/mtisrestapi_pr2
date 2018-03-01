@@ -9,18 +9,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/github.com/porhacer.git"
+    "url": "git+https://diegomgar@github.com/DiegoMGar/mtisrestapi_pr2.git"
   },
   "author": "Diego Maroto",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/github.com/porhacer/issues"
+    "url": "https://diegomgar@github.com/DiegoMGar/mtisrestapi_pr2/issues"
   },
-  "homepage": "https://github.com/github.com/porhacer#readme",
+  "homepage": "https://diegomgar@github.com/DiegoMGar/mtisrestapi_pr2#readme",
   "dependencies": {
     "body-parser": "^1.18.2",
     "cors": "^2.8.4",
     "express": "^4.16.2",
+    "http": "0.0.0",
     "mysql": "^2.15.0"
   }
 }
