@@ -1,0 +1,47 @@
+#%RAML 1.0
+title: MTIS Api Rest - Práctica 2
+mediaType: application/json
+baseUri: http://localhost:8080
+
+/validarNIF:
+    get:
+      description: Get if the nif in queryParameter is OK or not
+      queryParameters: 
+        nif:
+          type: string
+          example: "123456789X"
+        RestKey:
+          type: string
+      responses:
+        200:
+          description: The request was OK, check body response
+          body: 
+            example:
+              {"data": {"result": "true"}}
+        400:
+          description: Some queryParameters are missing
+        403:
+          description: You have not permission to use this action
+        500:
+          description: Server Internal Error
+/validarIBAN:
+    get:
+      description: Get if the iban in queryParameter is OK or not
+      queryParameters: 
+        iban:
+          type: string
+          example: "123456789X"
+        RestKey:
+          type: string
+      responses:
+        200:
+          description: The request was OK, check body response to know the return
+          body: 
+            example:
+              {"data": {"result": "true"}}
+        400:
+          description: Some queryParameters are missing
+        403:
+          description: You have not permission to use this action
+        500:
+          description: Server Internal Error
