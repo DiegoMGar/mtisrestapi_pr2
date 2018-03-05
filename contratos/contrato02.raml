@@ -1,5 +1,5 @@
 #%RAML 1.0
-title: MTIS Api Rest - Práctica 2
+title: Contrato 2 - MTIS PR2
 mediaType: application/json
 baseUri: http://localhost:3000
 
@@ -19,10 +19,10 @@ baseUri: http://localhost:3000
           body: 
             application/json:
               example:
-                {"data": {"codigoPostal":string,
-                  "poblacion":string,
-                  "provincia":string,
-                  "existe":boolean
+                {"data": {"codigoPostal": string,
+                  "poblacion": string,
+                  "provincia": string,
+                  "existe": boolean
                 }}
         400:
           description: Some queryParameters are missing

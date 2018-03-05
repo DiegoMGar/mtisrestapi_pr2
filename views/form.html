@@ -134,16 +134,17 @@
             $("#section2form").submit(function(e){
                 fetch("http://localhost:3000/validarNIF?nif="+$("#inputNIF").val()+"&RestKey="+$("#input2RK").val())
                 .then(function(resp){
-                    if(resp.status!=200)
-                        throw("http status = "+resp.status)
                     return resp.json()
                 })
                 .then(function(resp){
-                    $('.section2result').html('<p>Resultado: '+resp.data.result+'</p>')
+                    if(resp.error)
+                        throw resp.error
+                    else
+                        $('.section2result').html('<p>Resultado: '+resp.data+'</p>')
                     console.log("OK fetch validarNIF")
                 })
                 .catch(function(error){
-                    $('.section2result').html('<p>ERROR: '+error+'</p>')
+                    $('.section2result').html('<p>ERROR: '+JSON.stringify(error)+'</p>')
                     console.log("Error fetch validarNIF")
                 })
             })
@@ -153,11 +154,15 @@
                     return resp.json()
                 })
                 .then(function(resp){
-                    $('.section3result').html('<p>Resultado: '+resp.data.result+'</p>')
+                    if(resp.error)
+                        throw resp.error
+                    else
+                        $('.section3result').html('<p>Resultado: '+resp.data+'</p>')
                     console.log("OK fetch validarIBAN")
                 })
-                .catch(function(){
+                .catch(function(error){
                     console.log("Error fetch validarIBAN")
+                    $('.section3result').html('<p>ERROR: '+JSON.stringify(error)+'</p>')
                 })
             })
             $("#section4form").submit(function(e){
@@ -166,12 +171,15 @@
                     return resp.json()
                 })
                 .then(function(resp){
-                    console.log(resp)
-                    $('.section4result').html('<p>Resultado: '+JSON.stringify(resp.data)+'</p>')
+                    if(resp.error)
+                        throw resp.error
+                    else
+                        $('.section4result').html('<p>Resultado: '+JSON.stringify(resp.data)+'</p>')
                     console.log("OK fetch validarCP")
                 })
-                .catch(function(){
+                .catch(function(error){
                     console.log("Error fetch validarCP")
+                    $('.section4result').html('<p>ERROR: '+JSON.stringify(error)+'</p>')
                 })
             })
             $("#section5form").submit(function(e){
@@ -195,12 +203,15 @@
                     return resp.json()
                 })
                 .then(function(resp){
-                    console.log(resp)
-                    $('.section5result').html('<p>Resultado: '+JSON.stringify(resp.data)+'</p>')
-                    console.log("OK fetch validarCP")
+                    if(resp.error)
+                        throw resp.error
+                    else
+                        $('.section5result').html('<p>Resultado: '+JSON.stringify(resp.data)+'</p>')
+                    console.log("OK fetch generarPresupuesto")
                 })
-                .catch(function(){
-                    console.log("Error fetch validarCP")
+                .catch(function(error){
+                    console.log("Error fetch generarPresupuesto")
+                    $('.section5result').html('<p>ERROR: '+JSON.stringify(error)+'</p>')
                 })
             })
             $(".sectionMTISli").click(function(){

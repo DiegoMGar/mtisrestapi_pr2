@@ -101,6 +101,9 @@ function createPresupuesto(fecha, idCliente, referenciaProducto, cantidadProduct
         if(!idCliente.match(/^[0-9]+$/i)){
             resolve(false)
             return ;
+        }else if(parseInt(idCliente)<1){
+            resolve(false)
+            return ;
         }
         if(!referenciaProducto.match(/^[0-9a-zA-Z]+$/i)){
             resolve(false)
@@ -109,13 +112,17 @@ function createPresupuesto(fecha, idCliente, referenciaProducto, cantidadProduct
         if(!cantidadProducto.match(/^[0-9]+$/i)){
             resolve(false)
             return ;
-        }        var sql = 'insert into presupuestos values(default,?,?,?,?,default)'
+        }else if(parseInt(cantidadProducto)<1){
+            resolve(false)
+            return ;
+        }
+        var sql = 'insert into presupuestos values(default,?,?,?,?,default)'
         var inserts = [fecha, parseInt(idCliente), referenciaProducto, parseInt(cantidadProducto)]
         sql = mysql.format(sql, inserts)
         conn.query(sql,function(error,results){
             if(error){
                 console.log(error)
-                reject(false)
+                reject(true)
                 return ;
             }
             resolve(results.insertId)
@@ -134,7 +141,7 @@ function checkRK(rk){
         conn.query(sql,function(error,results){
             if(error){
                 console.log(error)
-                reject(false)
+                reject(true)
                 return ;
             }
             if(results.length>0){
@@ -151,101 +158,132 @@ app.get('/',function(req,resp){
     resp.sendFile('views/form.html', {root: __dirname })
 })
 app.get(endPointValidarNIF,function(req,resp){
+    var error = {status:0,msg:''}
+    if(!req.query.nif || !req.query.RestKey){
+        error.status=400;error.msg='Some params are missing'
+        resp.status(400)
+        resp.send({data:false,error:error})
+        return ;
+    }
     checkRK(req.query.RestKey)
     .then(function(result){
         if(!result){
+            error.status=403;error.msg='No tienes permiso para ejecutar esta función'
             resp.status(403)
-            resp.send({data:{result:false,msg:'Error checkeando la RestKey'}})
+            resp.send({data:false,error:error})
         }else{
             var ok = validarNIF(req.query.nif)
-            resp.send({data:{result:(ok? 'true':'false')}})
+            resp.send({data:(ok? 'true':'false')})
         }
     })
-    .catch(function(error){
-        console.log("rejected: "+error)
+    .catch(function(err){
+        error.status=500;error.msg='Server Internal Error'
         resp.status(500)
-        resp.send({data:{result:error,msg:'Server Internal Error'}})
-        return ;
+        resp.send({data:false,error:error})
     })
 })
 app.get(endPointValidarIBAN,function(req,resp){
+    var error = {status:0,msg:''}
+    if(!req.query.iban || !req.query.RestKey){
+        error.status=400;error.msg='Some params are missing'
+        resp.status(400)
+        resp.send({data:false,error:error})
+        return ;
+    }
     checkRK(req.query.RestKey)
     .then(function(result){
         if(!result){
+            error.status=403;error.msg='No tienes permiso para ejecutar esta función'
             resp.status(403)
-            resp.send({data:{result:false,msg:'Error checkeando la RestKey'}})
+            resp.send({data:false,error:error})
         }else{
             var ok = validarIBAN(req.query.iban)
-            resp.send({data:{result:(ok? 'true':'false')}})
+            resp.send({data:(ok? 'true':'false')})
         }
     })
-    .catch(function(error){
-        console.log("rejected: "+error)
+    .catch(function(err){
+        error.status=500;error.msg='Server Internal Error'
         resp.status(500)
-        resp.send({data:{result:error,msg:'Server Internal Error'}})
+        resp.send({data:false,error:error})
         return ;
     })
 })
 app.get(endPointConsultaCodigoPostal,function(req,resp){
+    var error = {status:0,msg:''}
+    if(!req.query.cp || !req.query.RestKey){
+        error.status=400;error.msg='Some params are missing'
+        resp.status(400)
+        resp.send({data:false,error:error})
+        return ;
+    }
     checkRK(req.query.RestKey)
     .then(function(result){
         if(!result){
+            error.status=403;error.msg='No tienes permiso para ejecutar esta función'
             resp.status(403)
-            resp.send({data:{result:false,msg:'Error checkeando la RestKey'}})
+            resp.send({data:false,error:error})
+            return new Promise((resolve,reject)=>reject(false))
         }else{
             return getCPObject(req.query.cp)
         }
     })
     .then(function(result){
         if(!result){
+            error.status=404;error.msg='CP not found'
             resp.status(404)
-            resp.send({data:{result:false,msg:'CP not found'}})
+            resp.send({data:false,error:error})
         }else{
             result.existe = true
             resp.send({data:result})
         }
     })
-    .catch(function(error){
-        console.log("rejected: "+error)
-        resp.status(500)
-        resp.send({data:{result:error,msg:'Server Internal Error'}})
-        return ;
+    .catch(function(err){
+        if(err){
+            error.status=500;error.msg='Server Internal Error'
+            resp.status(500)
+            resp.send({data:false,error:error})
+        }
     })
 })
 app.post(endPointGenerarPresupuesto,function(req,resp){
-    console.log(req.body)
+    var error = {status:0,msg:''}
     if(!req.body.fechaPresupuesto || !req.body.idCliente || !req.body.referenciaProducto || !req.body.cantidadProducto || !req.body.RestKey){
+        error.status=400;error.msg='Some params are missing'
         resp.status(400)
-        resp.send({data:{result:false,msg:'Some format of params are wrong'}})
+        resp.send({data:false,error:error})
         return ;
     }
     checkRK(req.body.RestKey)
     .then(function(result){
         if(!result){
+            error.status=403;error.msg='No tienes permiso para ejecutar esta función'
             resp.status(403)
-            resp.send({data:{result:false,msg:'Error checkeando la RestKey'}})
+            resp.send({data:false,error:error})
+            return new Promise((resolve,reject)=>reject(false))
         }else{
             return createPresupuesto(req.body.fechaPresupuesto,req.body.idCliente,req.body.referenciaProducto,req.body.cantidadProducto)
         }
     })
     .then(function(result){
         if(!result){
+            error.status=400;error.msg='Some format of params are wrong'
             resp.status(400)
-            resp.send({data:{result:false,msg:'Some format of params are wrong'}})
+            resp.send({data:false,error:error})
         }else{
             result.existe = true
             resp.send({data:{idPresupuesto: result, presupuestoGenerado:true}})
         }
     })
-    .catch(function(error){
-        console.log("rejected: "+error)
-        resp.status(500)
-        resp.send({data:{result:error,msg:'Server Internal Error'}})
-        return ;
+    .catch(function(err){
+        if(err){
+            error.status=500;error.msg='Server Internal Error'
+            resp.status(500)
+            resp.send({data:false,error:error})
+        }
     })
 })
 
 // RUNING SERVER
 app.listen(3000, function () {
-    console.log('El servidor express está en el puerto 3000')
+    console.log('MTIS PR2, por Diego Maroto, sirviendo por el puerto 3000')
 })

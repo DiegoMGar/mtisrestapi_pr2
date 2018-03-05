@@ -1,5 +1,5 @@
 #%RAML 1.0
-title: MTIS Api Rest - Práctica 2
+title: Contrato 3 - MTIS PR2
 mediaType: application/json
 baseUri: http://localhost:3000
 
@@ -8,9 +8,8 @@ baseUri: http://localhost:3000
       description: Create a new Presupuesto and return its id
       queryParameters: 
         fechaPresupuesto:
-          type: date
+          type: datetime
           description: Date YYYY-MM-DD
-          example: "2018/03/25"
         idCliente:
           type: integer
         referenciaProducto:
@@ -25,7 +24,7 @@ baseUri: http://localhost:3000
           body: 
             application/json:
               example:
-                {"data": {"idPresupuesto":integer,"presupuestoGenerado":boolean}}
+                {"data": {"idPresupuesto": integer, "presupuestoGenerado": boolean}}
         400:
           description: Some queryParameters are missing
         403:
