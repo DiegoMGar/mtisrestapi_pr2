@@ -42,6 +42,34 @@ INSERT INTO `codigospostales` VALUES (1,'03001','Alicante','Alicante'),(2,'03111
 UNLOCK TABLES;
 
 --
+-- Table structure for table `presupuestos`
+--
+
+DROP TABLE IF EXISTS `presupuestos`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `presupuestos` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `fecha` date DEFAULT NULL,
+  `idCliente` int(11) DEFAULT NULL,
+  `referenciaProducto` varchar(64) DEFAULT NULL,
+  `cantidadProducto` int(11) DEFAULT NULL,
+  `creado` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `presupuestos`
+--
+
+LOCK TABLES `presupuestos` WRITE;
+/*!40000 ALTER TABLE `presupuestos` DISABLE KEYS */;
+INSERT INTO `presupuestos` VALUES (1,'2018-02-15',123,'refAlgo',2,'2018-03-05 12:36:10'),(2,'2018-03-07',123,'asdf',12,'2018-03-05 12:43:13'),(3,'2018-03-07',123,'asdf',12,'2018-03-05 12:45:46'),(4,'2018-03-07',1234,'asdf',12,'2018-03-05 12:46:29'),(5,'2018-03-07',1234,'asdf',2,'2018-03-05 12:51:38'),(6,'2018-03-07',1234,'asdf',2,'2018-03-05 12:51:51');
+/*!40000 ALTER TABLE `presupuestos` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `restkeys`
 --
 
@@ -52,7 +80,7 @@ CREATE TABLE `restkeys` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `restkey` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -61,7 +89,7 @@ CREATE TABLE `restkeys` (
 
 LOCK TABLES `restkeys` WRITE;
 /*!40000 ALTER TABLE `restkeys` DISABLE KEYS */;
-INSERT INTO `restkeys` VALUES (1,'123456789');
+INSERT INTO `restkeys` VALUES (1,'123456789'),(2,'mtis');
 /*!40000 ALTER TABLE `restkeys` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -74,4 +102,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-03-05 11:08:25
+-- Dump completed on 2018-03-05 12:56:10
