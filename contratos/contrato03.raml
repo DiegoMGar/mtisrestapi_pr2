@@ -25,16 +25,10 @@ baseUri: http://localhost:3000
           body: 
             application/json:
               example:
-                {"data": {"codigoPostal":string.format("YYYY-MM-DD"),
-                  "poblacion":string,
-                  "provincia":string,
-                  "existe":boolean
-                }}
+                {"data": {"idPresupuesto":integer,"presupuestoGenerado":boolean}}
         400:
           description: Some queryParameters are missing
         403:
           description: You have not permission to use this action
-        404:
-          description: CP not found
         500:
           description: Server Internal Error
