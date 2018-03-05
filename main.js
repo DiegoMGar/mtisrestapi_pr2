@@ -72,9 +72,11 @@ function isDigit(str) {
 }
 function getCPObject(cp){
     return new Promise(function(resolve,reject){
-        if(!cp.match(/^[0-9]{5}$/i))
+        if(!cp.match(/^[0-9]{5}$/i)){
             resolve(false)
-        var sql = 'select * from codigospostales where cp = ?'
+            return ;
+        }
+        var sql = 'select cp as codigoPostal,poblacion,provincia from codigospostales where cp = ?'
         var inserts = [cp]
         sql = mysql.format(sql, inserts)
         conn.query(sql,function(error,results){
@@ -90,10 +92,42 @@ function getCPObject(cp){
         })
     })
 }
+function createPresupuesto(fecha, idCliente, referenciaProducto, cantidadProducto){
+    return new Promise(function(resolve,reject){
+        if(!fecha.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/i)){
+            resolve(false)
+            return ;
+        }
+        if(!idCliente.match(/^[0-9]+$/i)){
+            resolve(false)
+            return ;
+        }
+        if(!referenciaProducto.match(/^[0-9a-zA-Z]+$/i)){
+            resolve(false)
+            return ;
+        }
+        if(!cantidadProducto.match(/^[0-9]+$/i)){
+            resolve(false)
+            return ;
+        }        var sql = 'insert into presupuestos values(default,?,?,?,?,default)'
+        var inserts = [fecha, parseInt(idCliente), referenciaProducto, parseInt(cantidadProducto)]
+        sql = mysql.format(sql, inserts)
+        conn.query(sql,function(error,results){
+            if(error){
+                console.log(error)
+                reject(false)
+                return ;
+            }
+            resolve(results.insertId)
+        })
+    })
+}
 function checkRK(rk){
     return new Promise(function(resolve,reject){
-        if(!rk.match(/^[0-9a-zA-Zñ]+$/i))
+        if(!rk.match(/^[0-9a-zA-Zñ]+$/i)){
             resolve(false)
+            return ;
+        }
         var sql = 'select * from restkeys where restkey = ?'
         var inserts = [rk]
         sql = mysql.format(sql, inserts)
@@ -101,6 +135,7 @@ function checkRK(rk){
             if(error){
                 console.log(error)
                 reject(false)
+                return ;
             }
             if(results.length>0){
                 resolve(true)
@@ -166,7 +201,8 @@ app.get(endPointConsultaCodigoPostal,function(req,resp){
             resp.status(404)
             resp.send({data:{result:false,msg:'CP not found'}})
         }else{
-            resp.send({data:{result:true,cp:JSON.stringify(result)}})
+            result.existe = true
+            resp.send({data:result})
         }
     })
     .catch(function(error){
@@ -177,7 +213,36 @@ app.get(endPointConsultaCodigoPostal,function(req,resp){
     })
 })
 app.post(endPointGenerarPresupuesto,function(req,resp){
-    resp.send('OK')
+    console.log(req.body)
+    if(!req.body.fechaPresupuesto || !req.body.idCliente || !req.body.referenciaProducto || !req.body.cantidadProducto || !req.body.RestKey){
+        resp.status(400)
+        resp.send({data:{result:false,msg:'Some format of params are wrong'}})
+        return ;
+    }
+    checkRK(req.body.RestKey)
+    .then(function(result){
+        if(!result){
+            resp.status(403)
+            resp.send({data:{result:false,msg:'Error checkeando la RestKey'}})
+        }else{
+            return createPresupuesto(req.body.fechaPresupuesto,req.body.idCliente,req.body.referenciaProducto,req.body.cantidadProducto)
+        }
+    })
+    .then(function(result){
+        if(!result){
+            resp.status(400)
+            resp.send({data:{result:false,msg:'Some format of params are wrong'}})
+        }else{
+            result.existe = true
+            resp.send({data:{idPresupuesto: result, presupuestoGenerado:true}})
+        }
+    })
+    .catch(function(error){
+        console.log("rejected: "+error)
+        resp.status(500)
+        resp.send({data:{result:error,msg:'Server Internal Error'}})
+        return ;
+    })
 })
 
 // RUNING SERVER

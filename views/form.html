@@ -33,7 +33,7 @@
                 <h1>MTIS Práctica 2</h1>
                 <p>Práctica 2 de MTIS, cliente en html/js que se comunica con una APIREST en nodejs</p>
                 <p>Autor: Diego Maroto</p>
-                <p>La RestKey por defecto es: <b>123456789</b></p>
+                <p>La RestKey por defecto es: <b>mtis</b></p>
             </div>
             <div id="section2" class="sectionMTIS">
                 <h1>Valida un NIF</h1>
@@ -97,9 +97,33 @@
                 </div>
             </div>
             <div id="section5" class="sectionMTIS">
-                <h1>Section 4</h1>
-                <p>Try to scroll this sec while scrolling!</p>
-                <p>Try to scroll t bar while scrolling!</p>
+                <h1>Crea un presupuesto</h1>
+                <form id="section5form">
+                    <div class="form-group">
+                        <label for="inputIBAN">Fecha Presupuesto</label>
+                        <input type="date" class="form-control" id="inputFechaPresupuesto">
+                    </div>
+                    <div class="form-group">
+                        <label for="inputIBAN">ID Cliente</label>
+                        <input type="number" class="form-control" id="inputIdClientePresupuesto" placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label for="inputIBAN">Referencia Producto</label>
+                        <input type="text" class="form-control" id="inputRefProductoPresupuesto" placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label for="inputIBAN">Cantidad Producto</label>
+                        <input type="number" class="form-control" id="inputCantidadProductoPresupuesto" placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label for="inputRK">RestKey</label>
+                        <input type="text" class="form-control" id="input5RK" placeholder="RK">
+                    </div>
+                    <input type="submit" class="btn btn-default" value="ValidarIBAN">
+                </form>
+                <div class="section5result">
+                    <p>Resultado: -</p>
+                </div>
             </div>
             <form>
 
@@ -142,7 +166,37 @@
                     return resp.json()
                 })
                 .then(function(resp){
-                    $('.section4result').html('<p>Resultado: '+resp.data.result+(resp.data.cp? " - "+resp.data.cp:'')+'</p>')
+                    console.log(resp)
+                    $('.section4result').html('<p>Resultado: '+JSON.stringify(resp.data)+'</p>')
+                    console.log("OK fetch validarCP")
+                })
+                .catch(function(){
+                    console.log("Error fetch validarCP")
+                })
+            })
+            $("#section5form").submit(function(e){
+                var payload = {
+                    fechaPresupuesto:""+$("#inputFechaPresupuesto").val(),
+                    idCliente:""+$("#inputIdClientePresupuesto").val(),
+                    referenciaProducto:""+$("#inputRefProductoPresupuesto").val(),
+                    cantidadProducto:""+$("#inputCantidadProductoPresupuesto").val(),
+                    RestKey:""+$("#input5RK").val()
+                }
+
+                fetch("http://localhost:3000/generarPresupuesto"
+                ,{
+                    method:'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                })
+                .then(function(resp){
+                    return resp.json()
+                })
+                .then(function(resp){
+                    console.log(resp)
+                    $('.section5result').html('<p>Resultado: '+JSON.stringify(resp.data)+'</p>')
                     console.log("OK fetch validarCP")
                 })
                 .catch(function(){
