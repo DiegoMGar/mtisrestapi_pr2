@@ -33,6 +33,7 @@
                 <h1>MTIS Práctica 2</h1>
                 <p>Práctica 2 de MTIS, cliente en html/js que se comunica con una APIREST en nodejs</p>
                 <p>Autor: Diego Maroto</p>
+                <p>La RestKey por defecto es: <b>123456789</b></p>
             </div>
             <div id="section2" class="sectionMTIS">
                 <h1>Valida un NIF</h1>
@@ -41,6 +42,10 @@
                         <label for="inputNIF">NIF</label>
                         <input type="text" class="form-control" id="inputNIF" placeholder="NIF">
                     </div>
+                    <div class="form-group">
+                        <label for="inputRK">RestKey</label>
+                        <input type="text" class="form-control" id="input2RK" placeholder="RK">
+                    </div>
                     <input type="submit" class="btn btn-default" value="ValidarNIF">
                 </form>
                 <div class="section2result">
@@ -48,19 +53,53 @@
                 </div>
             </div>
             <div id="section3" class="sectionMTIS">
-                <h1>Section 2</h1>
-                <p>Try to scroll this section and look at the navigation bar while scrolling! Try to scroll this section and look at the navigation bar while scrolling!</p>
-                <p>Try to scroll this section and look at the navigation bar while scrolling! Try to scroll this section and look at the navigation bar while scrolling!</p>
+                <h1>Valida un IBAN</h1>
+                <form id="section3form">
+                    <div class="form-group">
+                        <label for="inputIBAN">IBAN</label>
+                        <input type="text" class="form-control" id="inputIBAN" placeholder="IBAN">
+                        <p>Ejemplo correcto: ES0690000001210123456789</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputRK">RestKey</label>
+                        <input type="text" class="form-control" id="input3RK" placeholder="RK">
+                    </div>
+                    <input type="submit" class="btn btn-default" value="ValidarIBAN">
+                </form>
+                <div class="section3result">
+                    <p>Resultado: -</p>
+                </div>
             </div>
             <div id="section4" class="sectionMTIS">
-                <h1>Section 3</h1>
-                <p>Try to scroll this section and look at the navigation bar while scrolling! Try to scroll this section and look at the navigation bar while scrolling!</p>
-                <p>Try to scroll this section and look at the navigation bar while scrolling! Try to scroll this section and look at the navigation bar while scrolling!</p>
+                <h1>Valida un Código Postal</h1>
+                <p>
+                    Válidos:
+                </p>
+                <ul>
+                    <li>03001</li>
+                    <li>03111</li>
+                    <li>03201</li>
+                    <li>02001</li>
+                </ul>
+                <form id="section4form">
+                    <div class="form-group">
+                        <label for="inputCP">Código Postal</label>
+                        <input type="text" class="form-control" id="inputCP" placeholder="Código Postal (03001)">
+                    </div>
+                    <div class="form-group">
+                        <label for="inputRK">RestKey</label>
+                        <input type="text" class="form-control" id="input4RK" placeholder="RK">
+                    </div>
+                    <input type="submit" class="btn btn-default" value="ValidarCP">
+                </form>
+                <div class="section4result">
+                    <p>Resultado: -</p>
+                </div>
             </div>
             <div id="section5" class="sectionMTIS">
                 <h1>Section 4</h1>
-                <p>Try to scroll this section and look at the navigation bar while scrolling! Try to scroll this section and look at the navigation bar while scrolling!</p>
-                <p>Try to scroll this section and look at the navigation bar while scrolling! Try to scroll this section and look at the navigation bar while scrolling!</p>
+                <p>Try to scroll this sec while scrolling!</p>
+                <p>Try to scroll t bar while scrolling!</p>
             </div>
             <form>
 
@@ -69,16 +108,45 @@
         <script>
             $("form").submit(function(e){e.preventDefault()})
             $("#section2form").submit(function(e){
-                fetch("http://localhost:3000/validarNIF?nif="+$("#inputNIF").val())
+                fetch("http://localhost:3000/validarNIF?nif="+$("#inputNIF").val()+"&RestKey="+$("#input2RK").val())
                 .then(function(resp){
+                    if(resp.status!=200)
+                        throw("http status = "+resp.status)
                     return resp.json()
                 })
                 .then(function(resp){
                     $('.section2result').html('<p>Resultado: '+resp.data.result+'</p>')
                     console.log("OK fetch validarNIF")
                 })
-                .catch(function(){
+                .catch(function(error){
+                    $('.section2result').html('<p>ERROR: '+error+'</p>')
                     console.log("Error fetch validarNIF")
+                })
+            })
+            $("#section3form").submit(function(e){
+                fetch("http://localhost:3000/validarIBAN?iban="+$("#inputIBAN").val()+"&RestKey="+$("#input3RK").val())
+                .then(function(resp){
+                    return resp.json()
+                })
+                .then(function(resp){
+                    $('.section3result').html('<p>Resultado: '+resp.data.result+'</p>')
+                    console.log("OK fetch validarIBAN")
+                })
+                .catch(function(){
+                    console.log("Error fetch validarIBAN")
+                })
+            })
+            $("#section4form").submit(function(e){
+                fetch("http://localhost:3000/consultaCodigoPostal?cp="+$("#inputCP").val()+"&RestKey="+$("#input4RK").val())
+                .then(function(resp){
+                    return resp.json()
+                })
+                .then(function(resp){
+                    $('.section4result').html('<p>Resultado: '+resp.data.result+(resp.data.cp? " - "+resp.data.cp:'')+'</p>')
+                    console.log("OK fetch validarCP")
+                })
+                .catch(function(){
+                    console.log("Error fetch validarCP")
                 })
             })
             $(".sectionMTISli").click(function(){

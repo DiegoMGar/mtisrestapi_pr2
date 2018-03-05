@@ -15,18 +15,50 @@ var endPointConsultaCodigoPostal = '/consultaCodigoPostal'
 var endPointGenerarPresupuesto = '/generarPresupuesto'
 
 // HELPERS
+function validarIBAN(input) {
+    var CODE_LENGTHS = {
+        AD: 24, AE: 23, AT: 20, AZ: 28, BA: 20, BE: 16, BG: 22, BH: 22, BR: 29,
+        CH: 21, CR: 21, CY: 28, CZ: 24, DE: 22, DK: 18, DO: 28, EE: 20, ES: 24,
+        FI: 18, FO: 18, FR: 27, GB: 22, GI: 23, GL: 18, GR: 27, GT: 28, HR: 21,
+        HU: 28, IE: 22, IL: 23, IS: 26, IT: 27, JO: 30, KW: 30, KZ: 20, LB: 28,
+        LI: 21, LT: 20, LU: 20, LV: 21, MC: 27, MD: 24, ME: 22, MK: 19, MR: 27,
+        MT: 31, MU: 30, NL: 18, NO: 15, PK: 24, PL: 28, PS: 29, PT: 25, QA: 29,
+        RO: 24, RS: 22, SA: 24, SE: 24, SI: 19, SK: 24, SM: 27, TN: 24, TR: 26
+    };
+    var iban = String(input).toUpperCase().replace(/[^A-Z0-9]/g, ''), // keep only alphanumeric characters
+            code = iban.match(/^([A-Z]{2})(\d{2})([A-Z\d]+)$/), // match and capture (1) the country code, (2) the check digits, and (3) the rest
+            digits;
+    // check syntax and length
+    if (!code || iban.length !== CODE_LENGTHS[code[1]]) {
+        return false;
+    }
+    // rearrange country code and check digits, and convert chars to ints
+    digits = (code[3] + code[1] + code[2]).replace(/[A-Z]/g, function (letter) {
+        return letter.charCodeAt(0) - 55;
+    });
+    // final check
+    return mod97(digits);
+}
+function mod97(string) {
+    var checksum = string.slice(0, 2), fragment;
+    for (var offset = 2; offset < string.length; offset += 7) {
+        fragment = String(checksum) + string.substring(offset, offset + 7);
+        checksum = parseInt(fragment, 10) % 97;
+    }
+    return checksum;
+}
 function validarNIF(nif){
     if(nif.length != 9 || !isLetter(nif.charAt(8)))
         return false
     else{
-        var parteNumerica = ""
+        var parteNumerica = ''
         for(var i=0;i<nif.length-1;i++){
             parteNumerica += nif.charAt(i)
             if(!isDigit(nif.charAt(i)))
             return false        			 
         }
         var numero = parseInt(parteNumerica)
-        var letras = "TRWAGMYFPDXBNJZSQVHLCKE"
+        var letras = 'TRWAGMYFPDXBNJZSQVHLCKE'
         if(letras.charAt(numero % 23) == nif.charAt(8).toUpperCase())
             return true
     }
@@ -38,23 +70,114 @@ function isLetter(str) {
 function isDigit(str) {
     return str.length === 1 && str.match(/[0-9]/i)
 }
+function getCPObject(cp){
+    return new Promise(function(resolve,reject){
+        if(!cp.match(/^[0-9]{5}$/i))
+            resolve(false)
+        var sql = 'select * from codigospostales where cp = ?'
+        var inserts = [cp]
+        sql = mysql.format(sql, inserts)
+        conn.query(sql,function(error,results){
+            if(error){
+                console.log(error)
+                reject(false)
+            }
+            if(results.length>0){
+                resolve(results[0])
+            }else{
+                resolve(false)
+            }
+        })
+    })
+}
+function checkRK(rk){
+    return new Promise(function(resolve,reject){
+        if(!rk.match(/^[0-9a-zA-Zñ]+$/i))
+            resolve(false)
+        var sql = 'select * from restkeys where restkey = ?'
+        var inserts = [rk]
+        sql = mysql.format(sql, inserts)
+        conn.query(sql,function(error,results){
+            if(error){
+                console.log(error)
+                reject(false)
+            }
+            if(results.length>0){
+                resolve(true)
+            }else{
+                resolve(false)
+            }
+        })
+    })
+}
 
 // GET FUNCTIONS
 app.get('/',function(req,resp){
     resp.sendFile('views/form.html', {root: __dirname })
 })
 app.get(endPointValidarNIF,function(req,resp){
-    var ok = validarNIF(req.query.nif)
-    resp.send({data:{result:(ok? "true":"false")}})
+    checkRK(req.query.RestKey)
+    .then(function(result){
+        if(!result){
+            resp.status(403)
+            resp.send({data:{result:false,msg:'Error checkeando la RestKey'}})
+        }else{
+            var ok = validarNIF(req.query.nif)
+            resp.send({data:{result:(ok? 'true':'false')}})
+        }
+    })
+    .catch(function(error){
+        console.log("rejected: "+error)
+        resp.status(500)
+        resp.send({data:{result:error,msg:'Server Internal Error'}})
+        return ;
+    })
 })
 app.get(endPointValidarIBAN,function(req,resp){
-    resp.send("OK")
+    checkRK(req.query.RestKey)
+    .then(function(result){
+        if(!result){
+            resp.status(403)
+            resp.send({data:{result:false,msg:'Error checkeando la RestKey'}})
+        }else{
+            var ok = validarIBAN(req.query.iban)
+            resp.send({data:{result:(ok? 'true':'false')}})
+        }
+    })
+    .catch(function(error){
+        console.log("rejected: "+error)
+        resp.status(500)
+        resp.send({data:{result:error,msg:'Server Internal Error'}})
+        return ;
+    })
 })
 app.get(endPointConsultaCodigoPostal,function(req,resp){
-    resp.send("OK")
+    checkRK(req.query.RestKey)
+    .then(function(result){
+        if(!result){
+            resp.status(403)
+            resp.send({data:{result:false,msg:'Error checkeando la RestKey'}})
+        }else{
+            return getCPObject(req.query.cp)
+        }
+    })
+    .then(function(result){
+        if(!result){
+            resp.status(404)
+            resp.send({data:{result:false,msg:'CP not found'}})
+        }else{
+            resp.send({data:{result:true,cp:JSON.stringify(result)}})
+        }
+    })
+    .catch(function(error){
+        console.log("rejected: "+error)
+        resp.status(500)
+        resp.send({data:{result:error,msg:'Server Internal Error'}})
+        return ;
+    })
 })
 app.post(endPointGenerarPresupuesto,function(req,resp){
-    resp.send("OK")
+    resp.send('OK')
 })
 
 // RUNING SERVER
