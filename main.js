@@ -131,6 +131,10 @@ function createPresupuesto(fecha, idCliente, referenciaProducto, cantidadProduct
 }
 function checkRK(rk){
     return new Promise(function(resolve,reject){
+        if(rk.match(/[*]+/i)){
+            reject(true)
+            return ;
+        }
         if(!rk.match(/^[0-9a-zA-Zñ]+$/i)){
             resolve(false)
             return ;
